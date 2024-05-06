@@ -120,10 +120,10 @@ def main():
     opp_friends = st.slider("Opportunity of making friends: How important are social opportunities?", 1, 10, 5)
     personal_safety = st.slider("Safety: How important is the safety of the campus and surrounding area?", 1, 10, 5)
 
-     weights = {'temperature_rating': temperature_importance,
-        'Cost of Living Index': cost_of_living_importance,
-        'Opportunity to make friends (proportion of youth aged 15-29)': opp_friends,
-        'Personal Safety': personal_safety}
+    weights = {'temperature_rating': temperature_importance,
+               'Cost of Living Index': cost_of_living_importance,
+               'Opportunity to make friends (proportion of youth aged 15-29)': opp_friends,
+               'Personal Safety': personal_safety}
 
     df = apply_preferences1(df, weights)
     #
