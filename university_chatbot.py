@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import requests
 
 # Function to load data
 def load_data(file_path):
@@ -122,6 +123,26 @@ def find_universities(df):
     except ValueError:
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
 
+def ask_chatgpt(question, api_key):
+    url = "https://api.openai.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    # Instruction for GPT to be concise
+    prompt = f"You are a university advisor, answer coincisely to: {question}"
+    data = {
+        "model": "gpt-3.5-turbo",  # Ensure you are using the appropriate model
+        "messages": [{"role": "user", "content": prompt}]
+    }
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 200:
+        return response.json()['choices'][0]['message']['content']
+    else:
+        print("Status Code:", response.status_code)
+        print("Response Body:", response.text)
+        return "Error fetching response from OpenAI."
+
 def main():
     st.title("University Recommendation Chatbot")
 
@@ -181,6 +202,20 @@ def main():
     st.subheader("Find Universities")
     df = sort_by_courses(df)
     find_universities(df)
+
+    st.title("University Information Chat")
+    # api_key = 'insert_api_here'
+
+    user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
+    submit_button = st.button("Submit")
+
+    if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
+        response = ask_chatgpt(user_input, api_key)
+        st.write("ChatGPT says:", response)
+    elif user_input.lower() in ['quit', 'exit', 'stop']:
+        st.write("Exiting... Thank you for using the University Info Chat!")
+        st.stop()
+
 
 if __name__ == "__main__":
     main()
