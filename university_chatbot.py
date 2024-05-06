@@ -87,11 +87,11 @@ def main():
     st.title("University Recommendation Chatbot")
 
     # Load data
-    file_path = 'Main_final.xlsx'
+    file_path = 'dataframe_scraped2.xlsx'
     df = load_data(file_path)
 
     # Normalize columns
-    numerical_columns = ['Personal Safety', 'Opportunity to make friends (proportion of youth aged 15-29)', 'temperature_rating', 'Cost of Living Index']
+    numerical_columns = ['Personal Safety', 'Opportunity to make friends (proportion of youth aged 15-29) ', 'temperature_rating', 'Cost of Living Index']
     for col in numerical_columns:
         df[col + '_normalized'] = normalize_column(df[col])
 
