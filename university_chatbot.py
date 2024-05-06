@@ -10,13 +10,22 @@ def load_data(file_path):
 def normalize_column(column):
     return (column - column.min()) / (column.max() - column.min())
 
-# Function to calculate score
-def calculate_score(row, weights):
-    score = 0
-    for factor, weight in weights.items():
-        normalized_column = factor + '_normalized'
-        score += row[normalized_column] * weight
-    return score
+# Function to calculate score (changed by andrea)
+def apply_preferences1(df, weights):
+    
+    # Define a function to calculate the score for a row
+    def calculate_score(row):
+        score = 0
+        for factor, weight in weights.items():
+            normalized_column = factor + '_normalized'
+            # Ensure the column exists to avoid KeyErrors
+            if normalized_column in row:
+                score += row[normalized_column] * (weight / 10)  # Normalize weight from 1-10 scale to 0.1-1.0
+        return score
+    
+    # Apply the calculate_score function to each row
+    df['score'] = df.apply(calculate_score, axis=1)
+    return df
 
 # Function to parse rank
 def parse_rank(rank):
@@ -103,6 +112,23 @@ def main():
     region_importance = st.slider("How important is region to you?", 1, 10, 5)
     climate_choices = st.multiselect("Choose climates:", df['Climate'].unique())
     climate_importance = st.slider("How important is climate to you?", 1, 10, 5)
+
+    #andrea 
+
+    temperature_importance = st.slider("Climate: How important is a favorable climate to you?", 1, 10, 5)
+    cost_of_living_importance = st.slider("Cost Index (the lower, the better): How important is affordability?", 1, 10, 5)
+    opp_friends = st.slider("Opportunity of making friends: How important are social opportunities?", 1, 10, 5)
+    personal_safety = st.slider("Safety: How important is the safety of the campus and surrounding area?", 1, 10, 5)
+
+     weights = {'temperature_rating': temperature_importance,
+        'Cost of Living Index': cost_of_living_importance,
+        'Opportunity to make friends (proportion of youth aged 15-29)': opp_friends,
+        'Personal Safety': personal_safety}
+
+    df = apply_preferences1(df, weights)
+    #
+
+    
 
     # Apply preferences
     df = apply_preferences(df, language_choices, language_importance, region_choices, region_importance, climate_choices, climate_importance)
