@@ -82,36 +82,29 @@ def apply_preferences(data, language_choices, language_importance, region_choice
 # Function to only consider available destinations (by course)
 def sort_by_courses(df):
     courses = ["CLEAM", "BIEM", "CLEF", "BIEF", "BEMACS", "BAI", "CLEACC", "BEMACC", "BESS", "BIEF-Econ"]
-    course_choice = st.multiselect("Choose your course: (only 1)", courses)
+    course_choices = st.multiselect("Choose your course: (you can select multiple)", courses)
 
-    def course_scraping(df, course_choice):
-        indices_to_drop = []
-
-            
-        for index, row in df.iterrows():
-            reserved_info = row['Reserved/Not Available']
-            if pd.isna(reserved_info):
-                continue  # Skip processing for NaN entries in 'Reserved/Not Available'
-                
-            # Strip leading characters and whitespace
-            trimmed_info = reserved_info.strip(" '")
-                
-            # Check conditions involving 'course_choice'
-            if course_choice in reserved_info:
-                if trimmed_info.startswith('R'):
-                    df.at[index, 'score'] += 0.02  # Boost the score
-                elif trimmed_info.startswith('N'):
-                    indices_to_drop.append(index)  # Mark for dropping
-            elif trimmed_info.startswith('R'):
-                indices_to_drop.append(index)  # Mark for dropping
-        
-        # Drop the rows marked for removal
-        df.drop(indices_to_drop, inplace=True)
+    if not course_choices:
+        st.write("Please select at least one course.")
         return df
+
+    def course_filter(row):
+        if pd.isna(row['Reserved/Not Available']):
+            return True  # Keep if no info available
+        reserved_info = row['Reserved/Not Available'].strip(" '")
+        for course in course_choices:
+            if course in row['Reserved/Not Available']:
+                if reserved_info.startswith('R'):
+                    row['score'] += 0.02
+                    return True
+                elif reserved_info.startswith('N'):
+                    return False
+        return reserved_info.startswith('R') == False
+
+    # Apply filter to DataFrame and return result
+    filtered_df = df[df.apply(course_filter, axis=1)]
+    return filtered_df
                     
-
-
-
 
 
 # Function to find universities (changed by Andrea)
