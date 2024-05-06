@@ -173,7 +173,7 @@ def main():
         ranking_weights[rank_type] = st.slider(f"How important is {rank_type}?", 1, 10, 5)
 
     # Apply ranking boost
-    max_ranking_boost = 0.02
+    max_ranking_boost = 0.05
     for index, row in df.iterrows():
         df.loc[index, 'score'] = apply_ranking_boost(row, ranking_weights, max_ranking_boost)
 
