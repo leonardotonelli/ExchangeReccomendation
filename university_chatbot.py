@@ -78,9 +78,11 @@ def apply_preferences(data, language_choices, language_importance, region_choice
 
     return data
 
-# Function to find universities
+# Function to find universities (changed by Andrea)
 def find_universities(df):
     try:
+        courses = ["CLEAM", "BIEM", "CLEF", "BIEF", "BEMACS", "BAI","CLEACC", "BEMACC", "BESS", "BIEF-Econ"]
+        course_choices = st.multiselect("Choose your course:", courses)
         user_score = float(st.text_input("Please enter your Exchange score: "))
         available_universities = df[df['Min Score'] <= user_score]
         top_universities = available_universities.sort_values(by='score', ascending=False).head(10)
