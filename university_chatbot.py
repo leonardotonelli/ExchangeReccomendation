@@ -87,7 +87,7 @@ def main():
     st.title("University Recommendation Chatbot")
 
     # Load data
-    file_path = 'dataframe_scraped2.xlsx'
+    file_path = 'dataframe_scaped2.xlsx'
     df = load_data(file_path)
 
     # Normalize columns
