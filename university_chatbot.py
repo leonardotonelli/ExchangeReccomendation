@@ -115,7 +115,9 @@ def main():
 
     #andrea 
 
-    temperature_importance = st.slider("Climate: How important is a favorable climate to you?", 1, 10, 5)
+    st.subheader("Additional Information")
+    
+    temperature_importance = st.slider("Temperature: How important is a favorable climate to you?", 1, 10, 5)
     cost_of_living_importance = st.slider("Cost Index (the lower, the better): How important is affordability?", 1, 10, 5)
     opp_friends = st.slider("Opportunity of making friends: How important are social opportunities?", 1, 10, 5)
     personal_safety = st.slider("Safety: How important is the safety of the campus and surrounding area?", 1, 10, 5)
