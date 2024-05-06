@@ -78,11 +78,46 @@ def apply_preferences(data, language_choices, language_importance, region_choice
 
     return data
 
+
+# Function to only consider available destinations (by course)
+def sort_by_courses(df):
+    courses = ["CLEAM", "BIEM", "CLEF", "BIEF", "BEMACS", "BAI", "CLEACC", "BEMACC", "BESS", "BIEF-Econ"]
+    course_choice = st.multiselect("Choose your course: (only 1)", courses)
+
+    def course_scraping(df, course_choice):
+        indices_to_drop = []
+
+            
+        for index, row in df.iterrows():
+            reserved_info = row['Reserved/Not Available']
+            if pd.isna(reserved_info):
+                continue  # Skip processing for NaN entries in 'Reserved/Not Available'
+                
+            # Strip leading characters and whitespace
+            trimmed_info = reserved_info.strip(" '")
+                
+            # Check conditions involving 'course_choice'
+            if course_choice in reserved_info:
+                if trimmed_info.startswith('R'):
+                    df.at[index, 'score'] += 0.02  # Boost the score
+                elif trimmed_info.startswith('N'):
+                    indices_to_drop.append(index)  # Mark for dropping
+            elif trimmed_info.startswith('R'):
+                indices_to_drop.append(index)  # Mark for dropping
+        
+        # Drop the rows marked for removal
+        df.drop(indices_to_drop, inplace=True)
+        return df
+                    
+
+
+
+
+
 # Function to find universities (changed by Andrea)
 def find_universities(df):
     try:
-        courses = ["CLEAM", "BIEM", "CLEF", "BIEF", "BEMACS", "BAI","CLEACC", "BEMACC", "BESS", "BIEF-Econ"]
-        course_choices = st.multiselect("Choose your course:", courses)
+        
         user_score = float(st.text_input("Please enter your Exchange score: "))
         available_universities = df[df['Min Score'] <= user_score]
         top_universities = available_universities.sort_values(by='score', ascending=False).head(10)
@@ -151,6 +186,7 @@ def main():
 
     # Find universities based on user's Exchange score
     st.subheader("Find Universities")
+    df = sort_by_courses(df)
     find_universities(df)
 
 if __name__ == "__main__":
