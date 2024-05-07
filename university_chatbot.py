@@ -189,24 +189,25 @@ def main():
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
 
-    user_input = st.text_input("Ask a question about universities:", key="chat")
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", on_change=clear_input)
 
     if user_input.lower() == 'exit':
         st.write("Exiting... Thank you for using the chat!")
         st.session_state.chat_history = []
         st.stop()
 
-    if user_input:
+    if user_input and user_input.strip() != '':
         response = chat_with_gpt(user_input, st.secrets["API_KEY"])
-        st.session_state.chat_history.append((user_input, response))
+        st.session_state.chat_history.append(("You: " + user_input, "ChatBot: " + response))
 
         for question, answer in st.session_state.chat_history:
-            st.text_area("Q:", value=question, height=75)
-            st.text_area("A:", value=answer, height=150)
+            st.text(question)
+            st.text(answer)
             st.write("---")  # Separator for readability
 
-        # Clear the input box after processing
-        st.session_state['chat'] = ""
+def clear_input():
+    st.session_state.chat = ""  # Clear the text input after the message is sent
+
 
 
 if __name__ == "__main__":
