@@ -189,36 +189,30 @@ def main():
     df = sort_by_courses(df)
     find_universities(df)
 
-    st.subheader("Ask any question")
-    st.session_state.chat_history = []
+    st.title("University Information Chat")
+    api_key = st.secrets["API_KEY"]
 
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", 
-                               key="user_input", 
-                               on_change=clear_input)
+    go_on = True
+    
+    while go_on:
+        user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
+        submit_button = st.button("Submit")
+        
+        if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
+            response = ask_chatgpt(user_input, api_key)
+            st.write("ChatBot says:", response)
+            # Store user response
+            user_responses[user_input] = response
+        elif user_input.lower() in ['quit', 'exit', 'stop']:
+            go_on = False
+            st.write("Exiting... Thank you for using the University Info Chat!")
+            st.stop()
+        else:
+            # Display previous answers
+            if user_input in user_responses:
+                st.write("Previous response:")
+                st.write(user_responses[user_input])
 
-    if user_input.lower() == 'exit':
-        st.write("Exiting... Thank you for using the chat!")
-        st.session_state.chat_history = []
-        st.stop()
-
-    if user_input and user_input.strip() != '':
-        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        st.session_state.chat_history.append((user_input, response))
-        st.session_state.user_input = ""  # Clear input box after processing the input
-
-        for question, answer in st.session_state.chat_history:
-            st.write("---")  # Separator for readability
-            col1, col2 = st.columns([1, 3])
-            with col1:
-                st.markdown("**You:**")
-            with col2:
-                st.info(question)  # Display the question in an info box
-
-            col1, col2 = st.columns([1, 3])
-            with col1:
-                st.markdown("**ChatBot:**")
-            with col2:
-                st.success(answer)  # Display the answer in a success box
 
 
 
