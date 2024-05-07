@@ -196,7 +196,7 @@ def main():
         st.write("ChatBot says:", response)
         # Store user response
         user_responses[user_input] = response
-    elif user_input.lower() in ['quit', 'exit', 'stop']:
+    
     if user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
         st.session_state.df = None  # Optionally clear session state
