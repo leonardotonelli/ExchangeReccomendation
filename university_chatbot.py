@@ -210,7 +210,6 @@ def main():
 
     st.title("University Information Chat")
     api_key = st.secrets["API_KEY"]
-    st.write("key", api_key)
     user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
     submit_button = st.button("Submit")
 
