@@ -204,7 +204,7 @@ def main():
     find_universities(df)
 
     st.title("University Information Chat")
-    api_key = 'sk-proj-YMvT0WTXtY9I5PyF1de1T3BlbkFJIfmdZzrYErPZ7lbrMqia'
+    api_key = 'sk-proj-6j96xyuOIqB5HxJG1AIST3BlbkFJyh207wFdD8GCUUMoNVRK'
 
     user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
     submit_button = st.button("Submit")
