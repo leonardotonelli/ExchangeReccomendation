@@ -218,24 +218,33 @@ def main():
 
     st.title("University Information Chatbot")
 
-    # Initialize or update chat history
-    if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = []
-    
+    # Chat input and response management
     user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
 
-    if user_input.lower() in ['quit', 'exit', 'stop']:
+    # Button to submit chat
+    submit = st.button("Submit")
+
+    if submit and user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
-        st.session_state.chat_history = []
         st.stop()
 
-    if user_input:
+    if submit and user_input:
+        # Check for session state and initialize if doesn't exist
+        if 'responses' not in st.session_state:
+            st.session_state.responses = []
+
+        # Get response from GPT-3
         response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        st.session_state.chat_history.append((user_input, response))
-        for q, a in st.session_state.chat_history:
-            st.text(f"Q: {q}")
-            st.text(f"A: {a}")
-        st.session_state['chat_query'] = ""  # Reset the input field for new input
+        # Append to session state for display
+        st.session_state.responses.append((user_input, response))
+        
+        # Display chat history
+        for question, answer in st.session_state.responses:
+            st.text_area("Q:", value=question, height=50)
+            st.text_area("A:", value=answer, height=100)
+
+        # Reset input box by manipulating key in text_input widget
+        st.experimental_rerun()
 
 
 if __name__ == "__main__":
