@@ -125,6 +125,7 @@ def find_universities(df):
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
 
 def ask_chatgpt(question, api_key):
+    print(api_key)
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
