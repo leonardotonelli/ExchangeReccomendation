@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
+import os
+
+api_key = os.getenv("API_KEY")
 
 # Function to load data
 def load_data(file_path):
