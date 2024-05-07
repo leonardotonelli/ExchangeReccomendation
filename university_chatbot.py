@@ -186,7 +186,7 @@ def main():
     find_universities(df)
 
     # Chat session
-        st.session_state.chat_history = []
+    st.session_state.chat_history = []
 
     user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", on_change=clear_input)
 
