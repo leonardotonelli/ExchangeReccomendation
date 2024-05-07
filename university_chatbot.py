@@ -218,25 +218,35 @@ def main():
 
     st.title("University Information Chat")
 
-# Ensure the chat history is initialized
+    # Initialize chat history if not already in session state
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
     
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key=f"chat_input_{len(st.session_state.chat_history)}")
+    # Function to handle the chat logic
+    def handle_chat():
+        # Generate a unique key for the current input based on the chat history length
+        current_key = f"chat_input_{len(st.session_state.chat_history)}"
+        user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key=current_key)
     
-    if user_input.lower() in ['quit', 'exit', 'stop']:
-        st.write("Exiting... Thank you for using the University Info Chat!")
-        st.session_state.chat_history = []  # Clear chat history
-        st.stop()
+        if user_input.lower() in ['quit', 'exit', 'stop']:
+            st.write("Exiting... Thank you for using the University Info Chat!")
+            # Optionally clear session state or perform other cleanup
+            del st.session_state.chat_history
+            st.stop()
     
-    if user_input:
-        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        st.session_state.chat_history.append((user_input, response))
-        st.write("ChatBot says:", response)
+        if user_input:
+            # Assuming ask_chatgpt is defined to send questions to a GPT model
+            response = ask_chatgpt(user_input, st.secrets["API_KEY"])
+            # Append both the question and the response to the chat history
+            st.session_state.chat_history.append((user_input, response))
+            # Display the response
+            st.write("ChatBot says:", response)
     
-        # Create a new input box for the next question automatically
-        st.text_input("Ask another question:", key=f"followup_input_{len(st.session_state.chat_history)}")
-
+            # Force the page to rerender by clearing the input box, enabling continuous input flow
+            st.session_state[current_key] = ""
+    
+    # Call the handle_chat function which sets up the input and handles submissions
+    handle_chat()
 
 if __name__ == "__main__":
     main()
