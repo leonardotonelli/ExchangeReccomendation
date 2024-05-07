@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import requests
 import os
+from openai import OpenAI
 # Define a dictionary to store user responses
 user_responses = {}
 # Function to load data
