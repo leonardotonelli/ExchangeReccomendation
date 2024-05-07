@@ -136,6 +136,9 @@ def ask_chatgpt(question, api_key):
         "model": "gpt-3.5-turbo",  # Ensure you are using the appropriate model
         "messages": [{"role": "user", "content": prompt}]
     }
+    print("API Request URL:", url)
+    print("API Request Headers:", headers)
+    print("API Request Data:", data)
     response = requests.post(url, headers=headers, json=data)
     if response.status_code == 200:
         return response.json()['choices'][0]['message']['content']
@@ -143,6 +146,7 @@ def ask_chatgpt(question, api_key):
         print("Status Code:", response.status_code)
         print("Response Body:", response.text)
         return "Error fetching response from OpenAI."
+
 
 def main():
     st.title("University Recommendation Chatbot")
