@@ -130,7 +130,7 @@ def ask_chatgpt(question, api_key):
         "Content-Type": "application/json"
     }
     # Instruction for GPT to be concise
-    prompt = f"You are a university advisor, answer coincisely to: {question}"
+    prompt = f"You are a university advisor, at the end of every response ask whether the user as any other question or wants to end typing 'exit', answer coincisely to: {question}"
     data = {
         "model": "gpt-3.5-turbo",  # Ensure you are using the appropriate model
         "messages": [{"role": "user", "content": prompt}]
