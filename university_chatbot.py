@@ -168,6 +168,10 @@ def main():
 
     find_universities(df)
 
+
+    # Chatbot
+    st.subheader("Personal Exchange Assistant")
+    st.write("Ask anything you want except information specific to past Bocconi exchange students")
     if "openai_model" not in st.session_state:
         st.session_state["openai_model"] = "gpt-3.5-turbo"
 
@@ -184,7 +188,7 @@ def main():
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        with st.chat_message("Exchange assistant"):
+        with st.chat_message("assistant"):
             stream = client.chat.completions.create(
                 model=st.session_state["openai_model"],
                 messages=[
@@ -194,7 +198,7 @@ def main():
                 stream=True,
             )
             response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "Exchange assistant", "content": response})
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
 
 def clear_input():
