@@ -1,0 +1,27 @@
+name: Run Python Script
+
+on:
+  push:
+    branches:
+      - main  # Adjust branch name if needed
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt  # Adjust as needed
+
+      - name: Run Python script with secret
+        env:
+          API_KEY: ${{ secrets.API_KEY }}  # Access the secret
+        run: python your_script.py  # Replace with your script name
