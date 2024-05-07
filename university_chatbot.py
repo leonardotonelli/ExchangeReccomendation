@@ -185,10 +185,12 @@ def main():
     df = sort_by_courses(df)
     find_universities(df)
 
-    # Chat session
+    st.subheader("Ask any question")
     st.session_state.chat_history = []
 
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", on_change=clear_input)
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", 
+                               key="user_input", 
+                               on_change=clear_input)
 
     if user_input.lower() == 'exit':
         st.write("Exiting... Thank you for using the chat!")
@@ -197,15 +199,22 @@ def main():
 
     if user_input and user_input.strip() != '':
         response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        st.session_state.chat_history.append(("You: " + user_input, "ChatBot: " + response))
+        st.session_state.chat_history.append((user_input, response))
+        st.session_state.user_input = ""  # Clear input box after processing the input
 
         for question, answer in st.session_state.chat_history:
-            st.text(question)
-            st.text(answer)
             st.write("---")  # Separator for readability
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                st.markdown("**You:**")
+            with col2:
+                st.info(question)  # Display the question in an info box
 
-def clear_input():
-    st.session_state.chat = ""  # Clear the text input after the message is sent
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                st.markdown("**ChatBot:**")
+            with col2:
+                st.success(answer)  # Display the answer in a success box
 
 
 
