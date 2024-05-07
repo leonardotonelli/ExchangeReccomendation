@@ -196,7 +196,7 @@ def main():
         st.stop()
 
     if user_input and user_input.strip() != '':
-        response = chat_with_gpt(user_input, st.secrets["API_KEY"])
+        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
         st.session_state.chat_history.append(("You: " + user_input, "ChatBot: " + response))
 
         for question, answer in st.session_state.chat_history:
