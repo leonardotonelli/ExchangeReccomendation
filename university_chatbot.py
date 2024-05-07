@@ -190,9 +190,6 @@ def main():
         st.session_state["openai_model"] = "gpt-3.5-turbo"
 
     # Chat session
-    with st.chat_message("user"):
-        st.write("Exchange assistant")
-
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -205,7 +202,7 @@ def main():
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        with st.chat_message("assistant"):
+        with st.chat_message("Exchange assistant"):
             stream = client.chat.completions.create(
                 model=st.session_state["openai_model"],
                 messages=[
