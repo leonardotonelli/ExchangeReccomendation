@@ -185,7 +185,7 @@ def main():
     df = sort_by_courses(df)
     client = st.secrets["API_KEY"]
     find_universities(df)
-    
+
     if "openai_model" not in st.session_state:
         st.session_state["openai_model"] = "gpt-3.5-turbo"
 
@@ -215,8 +215,7 @@ def main():
                 stream=True,
             )
         response = st.write_stream(stream)
-    st.session_state.messages.append({"role": "Exchange assistant", "content": response})
-
+        st.session_state.messages.append({"role": "Exchange assistant", "content": response})
 
     
     st.session_state.chat_history = []
