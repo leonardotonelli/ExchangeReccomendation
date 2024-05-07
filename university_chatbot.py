@@ -184,14 +184,14 @@ def main():
     st.subheader("Find Universities")
     df = sort_by_courses(df)
     client = st.secrets["API_KEY"]
+    find_universities(df)
     
     if "openai_model" not in st.session_state:
         st.session_state["openai_model"] = "gpt-3.5-turbo"
 
     # Chat session
     with st.chat_message("user"):
-        find_universities(df)
-        st.write("Hey I'm your Exchange assistant, ask any question about universities! ")
+        st.write("Exchange assistant")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -215,7 +215,7 @@ def main():
                 stream=True,
             )
         response = st.write_stream(stream)
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "Exchange assistant", "content": response})
 
 
     
