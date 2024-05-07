@@ -3,14 +3,11 @@ import pandas as pd
 import numpy as np
 import requests
 import os
-
 # Define a dictionary to store user responses
 user_responses = {}
-
 # Function to load data
 def load_data(file_path):
     return pd.read_excel(file_path)
-
 # Function to normalize columns
 def normalize_column(column):
     # Ensuring zero division handling
@@ -19,7 +16,6 @@ def normalize_column(column):
         return column
     else:
         return (column - column.min()) / range
-
 # Function to calculate score (changed by andrea)
 def apply_preferences1(df, weights):
     
@@ -36,7 +32,6 @@ def apply_preferences1(df, weights):
     # Apply the calculate_score function to each row
     df['score'] = df.apply(calculate_score, axis=1)
     return df
-
 # Function to parse rank
 def parse_rank(rank):
     if pd.isna(rank):
@@ -45,7 +40,6 @@ def parse_rank(rank):
         low, high = map(int, rank.split('-'))
         return (low + high) / 2
     return int(rank)
-
 # Function to apply ranking boost
 def apply_ranking_boost(row, ranking_weights, max_rank_boost=0.02):
     boost = 0
@@ -57,47 +51,37 @@ def apply_ranking_boost(row, ranking_weights, max_rank_boost=0.02):
             normalized_weight = (weight / total_weight) * max_rank_boost
             boost += normalized_weight * (1 / np.log(rank_position + 1))
     return row['score'] + boost
-
 # Function to apply user preferences
 def apply_preferences(data, language_choices, language_importance, region_choices, region_importance, climate_choices, climate_importance):
     max_base_boost = 0.02
     language_importance = int(language_importance) if language_importance else 5
     region_importance = int(region_importance) if region_importance else 5
     climate_importance = int(climate_importance) if climate_importance else 5
-
     def calculate_boosts(choices, importance, max_boost):
         boosts = [max_boost * ((len(choices) - i) / len(choices)) * (importance / 10) for i in range(len(choices))]
         return boosts
-
     if language_choices:
         data = data[data['Language'].isin(language_choices)]
         language_boosts = calculate_boosts(language_choices, language_importance, max_base_boost)
         for index, language in enumerate(language_choices):
             if index < len(language_boosts):
                 data.loc[data['Language'] == language, 'score'] += language_boosts[index]
-
     if region_choices:
         region_boosts = calculate_boosts(region_choices, region_importance, max_base_boost)
         for index, region in enumerate(region_choices):
             data.loc[data['Region'] == region, 'score'] += region_boosts[index]
-
     if climate_choices:
         climate_boosts = calculate_boosts(climate_choices, climate_importance, max_base_boost)
         for index, climate in enumerate(climate_choices):
             data.loc[data['Climate'] == climate, 'score'] += climate_boosts[index]
-
     return data
-
-
 # Function to only consider available destinations (by course)
 def sort_by_courses(df):
     courses = ["CLEAM", "BIEM", "CLEF", "BIEF", "BEMACS", "BAI", "CLEACC", "BEMACC", "BESS", "BIEF-Econ"]
     course_choices = st.multiselect("Choose your course: (you can select multiple)", courses)
-
     if not course_choices:
         st.write("Please select at least one course.")
         return df
-
     def course_filter(row):
         if pd.isna(row['Reserved/Not Available']):
             return True  # Keep if no info available
@@ -110,13 +94,10 @@ def sort_by_courses(df):
                 elif reserved_info.startswith('N'):
                     return False
         return reserved_info.startswith('R') == False
-
     # Apply filter to DataFrame and return result
     filtered_df = df[df.apply(course_filter, axis=1)]
     return filtered_df
                     
-
-
 # Function to find universities (changed by Andrea)
 def find_universities(df):
     try:
@@ -131,7 +112,6 @@ def find_universities(df):
             st.write(top_universities[['University', 'Max Score', 'Min Score']])
     except ValueError:
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
-
 def ask_chatgpt(question, api_key):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
@@ -154,20 +134,15 @@ def ask_chatgpt(question, api_key):
         print("Status Code:", response.status_code)
         print("Response Body:", response.text)
         return "Error fetching response from OpenAI."
-
-
 def main():
     st.title("University Recommendation Chatbot")
-
     # Load data
     file_path = 'dataframe_scaped2.xlsx'
     df = load_data(file_path)
-
     # Normalize columns
     numerical_columns = ['Personal Safety', 'Opportunity to make friends (proportion of youth aged 15-29) ', 'temperature_rating', 'Cost of Living Index']
     for col in numerical_columns:
         df[col + '_normalized'] = normalize_column(df[col])
-
     # Get user preferences
     st.subheader("User Preferences")
     language_choices = st.multiselect("Choose languages:", df['Language'].unique())
@@ -176,29 +151,22 @@ def main():
     region_importance = st.slider("How important is region to you?", 1, 10, 5)
     climate_choices = st.multiselect("Choose climates:", df['Climate'].unique())
     climate_importance = st.slider("How important is the type of climate to you?", 1, 10, 5)
-
     #andrea 
-
     st.subheader("Additional Information")
     
     temperature_importance = st.slider("Temperature: How important is are favorable temperature and humidity to you?", 1, 10, 5)
     cost_of_living_importance = st.slider("Cost Index (the lower, the better): How important is affordability?", 1, 10, 5)
     opp_friends = st.slider("Opportunity of making friends: How important are social opportunities?", 1, 10, 5)
     personal_safety = st.slider("Safety: How important is the safety of the campus and surrounding area?", 1, 10, 5)
-
     weights = {'temperature_rating': temperature_importance,
                'Cost of Living Index': cost_of_living_importance,
                'Opportunity to make friends (proportion of youth aged 15-29)': opp_friends,
                'Personal Safety': personal_safety}
-
     df = apply_preferences1(df, weights)
     #
-
     
-
     # Apply preferences
     df = apply_preferences(df, language_choices, language_importance, region_choices, region_importance, climate_choices, climate_importance)
-
     # Get user ranking preferences
     st.subheader("Ranking Preferences")
     ranking_types = df.filter(like='Rankings').columns
@@ -207,6 +175,7 @@ def main():
         ranking_weights[rank_type] = st.slider(f"How important is {rank_type}?", 1, 10, 5)
 
     # Apply ranking boost
+    max_ranking_boost = 0.05
     max_ranking_boost = 0.1
     for index, row in df.iterrows():
         df.loc[index, 'score'] = apply_ranking_boost(row, ranking_weights, max_ranking_boost)
@@ -216,37 +185,31 @@ def main():
     df = sort_by_courses(df)
     find_universities(df)
 
-    st.title("University Information Chatbot")
+    st.title("University Information Chat")
+    api_key = st.secrets["API_KEY"]
+    user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
+    submit_button = st.button("Submit")
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
 
-    # Load data
-    file_path = 'dataframe_scaped2.xlsx'
-    df = load_data(file_path)
-    numerical_columns = ['Personal Safety', 'Opportunity to make friends', 'temperature_rating', 'Cost of Living Index']
-    for col in numerical_columns:
-        df[col + '_normalized'] = normalize_column(df[col])
-
-    # Manage chat interactions
-    if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = []
-
-    # Text input for user questions
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key=f"input_{len(st.session_state.chat_history)}")
-
-    if user_input.lower() == 'exit':
+    if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
+        response = ask_chatgpt(user_input, api_key)
+        st.write("ChatBot says:", response)
+        # Store user response
+        user_responses[user_input] = response
+    elif user_input.lower() in ['quit', 'exit', 'stop']:
+    if user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
-        st.session_state.chat_history = []  # Optionally clear chat history
+        st.session_state.df = None  # Optionally clear session state
         st.stop()
+    else:
+        # Display previous answers
+        if user_input in user_responses:
+            st.write("Previous response:")
+            st.write(user_responses[user_input])
 
     if user_input:
         response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        st.session_state.chat_history.append((user_input, response))
-
-        for idx, (q, a) in enumerate(st.session_state.chat_history):
-            st.text_area(f"Q{idx+1}:", value=q, height=75, key=f"q_{idx}")
-            st.text_area(f"A{idx+1}:", value=a, height=150, key=f"a_{idx}")
-
-        # Update the key for the new input box
-        st.text_input("Ask another question:", key=f"input_{len(st.session_state.chat_history)}")
+        st.write("ChatBot says:", response)
 
 
 if __name__ == "__main__":
