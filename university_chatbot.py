@@ -4,6 +4,9 @@ import numpy as np
 import requests
 import os
 
+# Define a dictionary to store user responses
+user_responses = {}
+
 # Function to load data
 def load_data(file_path):
     return pd.read_excel(file_path)
@@ -216,10 +219,16 @@ def main():
     if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
         response = ask_chatgpt(user_input, api_key)
         st.write("ChatBot says:", response)
+        # Store user response
+        user_responses[user_input] = response
     elif user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
         st.stop()
-
+    else:
+        # Display previous answers
+        if user_input in user_responses:
+            st.write("Previous response:")
+            st.write(user_responses[user_input])
 
 if __name__ == "__main__":
     main()
