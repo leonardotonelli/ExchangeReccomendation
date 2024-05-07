@@ -216,7 +216,7 @@ def main():
 
     if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
         response = ask_chatgpt(user_input, api_key)
-        st.write("ChatBot says:", api_key)
+        st.write("ChatBot says:", response)
     elif user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
         st.stop()
