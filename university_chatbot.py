@@ -4,6 +4,8 @@ import numpy as np
 import requests
 import os
 
+api_key = os.getenv("API_KEY")
+
 # Function to load data
 def load_data(file_path):
     return pd.read_excel(file_path)
@@ -205,7 +207,7 @@ def main():
     find_universities(df)
 
     st.title("University Information Chat")
-    api_key = os.getenv("API_KEY")
+    
 
     user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
     submit_button = st.button("Submit")
