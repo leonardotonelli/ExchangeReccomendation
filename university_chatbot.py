@@ -218,33 +218,35 @@ def main():
 
     st.title("University Information Chatbot")
 
-    # Chat input and response management
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
+    # Load data
+    file_path = 'dataframe_scaped2.xlsx'
+    df = load_data(file_path)
+    numerical_columns = ['Personal Safety', 'Opportunity to make friends', 'temperature_rating', 'Cost of Living Index']
+    for col in numerical_columns:
+        df[col + '_normalized'] = normalize_column(df[col])
 
-    # Button to submit chat
-    submit = st.button("Submit")
+    # Manage chat interactions
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
 
-    if submit and user_input.lower() in ['quit', 'exit', 'stop']:
+    # Text input for user questions
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key=f"input_{len(st.session_state.chat_history)}")
+
+    if user_input.lower() == 'exit':
         st.write("Exiting... Thank you for using the University Info Chat!")
+        st.session_state.chat_history = []  # Optionally clear chat history
         st.stop()
 
-    if submit and user_input:
-        # Check for session state and initialize if doesn't exist
-        if 'responses' not in st.session_state:
-            st.session_state.responses = []
-
-        # Get response from GPT-3
+    if user_input:
         response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        # Append to session state for display
-        st.session_state.responses.append((user_input, response))
-        
-        # Display chat history
-        for question, answer in st.session_state.responses:
-            st.text_area("Q:", value=question, height=50)
-            st.text_area("A:", value=answer, height=100)
+        st.session_state.chat_history.append((user_input, response))
 
-        # Reset input box by manipulating key in text_input widget
-        st.experimental_rerun()
+        for idx, (q, a) in enumerate(st.session_state.chat_history):
+            st.text_area(f"Q{idx+1}:", value=q, height=75, key=f"q_{idx}")
+            st.text_area(f"A{idx+1}:", value=a, height=150, key=f"a_{idx}")
+
+        # Update the key for the new input box
+        st.text_input("Ask another question:", key=f"input_{len(st.session_state.chat_history)}")
 
 
 if __name__ == "__main__":
