@@ -216,38 +216,27 @@ def main():
     df = sort_by_courses(df)
     find_universities(df)
 
-    st.title("University Information Chat")
+    st.title("University Information Chatbot")
 
-    # Initialize chat history if not already in session state
+    # Initialize or update chat history
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
     
-    # Function to handle the chat logic
-    def handle_chat():
-        # Generate a unique key for the current input based on the chat history length
-        current_key = f"chat_input_{len(st.session_state.chat_history)}"
-        user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key=current_key)
-    
-        if user_input.lower() in ['quit', 'exit', 'stop']:
-            st.write("Exiting... Thank you for using the University Info Chat!")
-            st.session_state.chat_history = []  # Clear chat history
-            st.stop()
-    
-        if user_input:
-            # Assuming ask_chatgpt is defined to send questions to a GPT model
-            response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-            # Append both the question and the response to the chat history
-            st.session_state.chat_history.append((user_input, response))
-            # Display the response
-            st.write("ChatBot says:", response)
-    
-            # Clear the input box by generating a new key for future inputs
-            # This line is removed: st.session_state[current_key] = ""
-            # Instead, we generate a new key as follows:
-            st.text_input("Ask another question:", key=f"followup_input_{len(st.session_state.chat_history)}")
-    
-    # Call the handle_chat function which sets up the input and handles submissions
-    handle_chat()
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
+
+    if user_input.lower() in ['quit', 'exit', 'stop']:
+        st.write("Exiting... Thank you for using the University Info Chat!")
+        st.session_state.chat_history = []
+        st.stop()
+
+    if user_input:
+        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
+        st.session_state.chat_history.append((user_input, response))
+        for q, a in st.session_state.chat_history:
+            st.text(f"Q: {q}")
+            st.text(f"A: {a}")
+        st.session_state['chat_query'] = ""  # Reset the input field for new input
+
 
 if __name__ == "__main__":
     main()
