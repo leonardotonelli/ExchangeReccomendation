@@ -185,31 +185,28 @@ def main():
     df = sort_by_courses(df)
     find_universities(df)
 
-    st.title("University Information Chat")
-    api_key = st.secrets["API_KEY"]
-    user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
-    submit_button = st.button("Submit")
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
+    # Chat session
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
 
-    if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
-        response = ask_chatgpt(user_input, api_key)
-        st.write("ChatBot says:", response)
-        # Store user response
-        user_responses[user_input] = response
-    
-    if user_input.lower() in ['quit', 'exit', 'stop']:
-        st.write("Exiting... Thank you for using the University Info Chat!")
-        st.session_state.df = None  # Optionally clear session state
+    user_input = st.text_input("Ask a question about universities:", key="chat")
+
+    if user_input.lower() == 'exit':
+        st.write("Exiting... Thank you for using the chat!")
+        st.session_state.chat_history = []
         st.stop()
-    else:
-        # Display previous answers
-        if user_input in user_responses:
-            st.write("Previous response:")
-            st.write(user_responses[user_input])
 
     if user_input:
-        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
-        st.write("ChatBot says:", response)
+        response = chat_with_gpt(user_input, st.secrets["API_KEY"])
+        st.session_state.chat_history.append((user_input, response))
+
+        for question, answer in st.session_state.chat_history:
+            st.text_area("Q:", value=question, height=75)
+            st.text_area("A:", value=answer, height=150)
+            st.write("---")  # Separator for readability
+
+        # Clear the input box after processing
+        st.session_state['chat'] = ""
 
 
 if __name__ == "__main__":
