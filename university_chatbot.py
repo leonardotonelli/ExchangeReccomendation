@@ -162,13 +162,13 @@ def main():
     region_choices = st.multiselect("Choose regions:", df['Region'].unique())
     region_importance = st.slider("How important is region to you?", 1, 10, 5)
     climate_choices = st.multiselect("Choose climates:", df['Climate'].unique())
-    climate_importance = st.slider("How important is climate to you?", 1, 10, 5)
+    climate_importance = st.slider("How important is the type of climate to you?", 1, 10, 5)
 
     #andrea 
 
     st.subheader("Additional Information")
     
-    temperature_importance = st.slider("Temperature: How important is a favorable climate to you?", 1, 10, 5)
+    temperature_importance = st.slider("Temperature: How important is are favorable temperature and humidity to you?", 1, 10, 5)
     cost_of_living_importance = st.slider("Cost Index (the lower, the better): How important is affordability?", 1, 10, 5)
     opp_friends = st.slider("Opportunity of making friends: How important are social opportunities?", 1, 10, 5)
     personal_safety = st.slider("Safety: How important is the safety of the campus and surrounding area?", 1, 10, 5)
