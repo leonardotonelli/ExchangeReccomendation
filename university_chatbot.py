@@ -230,8 +230,7 @@ def main():
     
         if user_input.lower() in ['quit', 'exit', 'stop']:
             st.write("Exiting... Thank you for using the University Info Chat!")
-            # Optionally clear session state or perform other cleanup
-            del st.session_state.chat_history
+            st.session_state.chat_history = []  # Clear chat history
             st.stop()
     
         if user_input:
@@ -242,8 +241,10 @@ def main():
             # Display the response
             st.write("ChatBot says:", response)
     
-            # Force the page to rerender by clearing the input box, enabling continuous input flow
-            st.session_state[current_key] = ""
+            # Clear the input box by generating a new key for future inputs
+            # This line is removed: st.session_state[current_key] = ""
+            # Instead, we generate a new key as follows:
+            st.text_input("Ask another question:", key=f"followup_input_{len(st.session_state.chat_history)}")
     
     # Call the handle_chat function which sets up the input and handles submissions
     handle_chat()
