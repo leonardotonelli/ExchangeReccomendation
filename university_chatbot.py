@@ -134,10 +134,6 @@ def ask_chatgpt(question, api_key):
         print("Status Code:", response.status_code)
         print("Response Body:", response.text)
         return "Error fetching response from OpenAI."
-
-def clear_input():
-        # Clear the text input after the message is sent
-        st.session_state.user_input = ""
 def main():
     st.title("University Recommendation Chatbot")
     # Load data
@@ -187,32 +183,62 @@ def main():
     # Find universities based on user's Exchange score
     st.subheader("Find Universities")
     df = sort_by_courses(df)
-    find_universities(df)
-
-    st.title("University Information Chat")
-    api_key = st.secrets["API_KEY"]
-
-    go_on = True
+    client = st.secrets["API_KEY"]
     
-    while go_on:
-        user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
-        submit_button = st.button("Submit")
-        
-        if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
-            response = ask_chatgpt(user_input, api_key)
-            st.write("ChatBot says:", response)
-            # Store user response
-            user_responses[user_input] = response
-        elif user_input.lower() in ['quit', 'exit', 'stop']:
-            go_on = False
-            st.write("Exiting... Thank you for using the University Info Chat!")
-            st.stop()
-        else:
-            # Display previous answers
-            if user_input in user_responses:
-                st.write("Previous response:")
-                st.write(user_responses[user_input])
+    if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = "gpt-3.5-turbo"
 
+    # Chat session
+    with st.chat_message("user"):
+        find_universities(df)
+        st.write("Hey I'm your Exchange assistant, ask any question about universities! ")
+
+    if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+    for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+    if prompt := st.chat_input("How's NTU reputation worldwide?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            stream = client.chat.completions.create(
+                model=st.session_state["openai_model"],
+            messages=[
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ],
+            stream=True,
+        )
+        response = st.write_stream(stream)
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+
+    
+    st.session_state.chat_history = []
+
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", on_change=clear_input)
+
+    if user_input.lower() == 'exit':
+        st.write("Exiting... Thank you for using the chat!")
+        st.session_state.chat_history = []
+        st.stop()
+
+    if user_input and user_input.strip() != '':
+        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
+        st.session_state.chat_history.append(("You: " + user_input, "ChatBot: " + response))
+
+        for question, answer in st.session_state.chat_history:
+            st.text(question)
+            st.text(answer)
+            st.write("---")  # Separator for readability
+
+def clear_input():
+    st.session_state.chat = ""  # Clear the text input after the message is sent
 
 
 
