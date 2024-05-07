@@ -125,7 +125,6 @@ def find_universities(df):
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
 
 def ask_chatgpt(question, api_key):
-    print(api_key)
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -217,7 +216,7 @@ def main():
 
     if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
         response = ask_chatgpt(user_input, api_key)
-        st.write("ChatBot says:", response)
+        st.write("ChatBot says:", api_key)
     elif user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
         st.stop()
