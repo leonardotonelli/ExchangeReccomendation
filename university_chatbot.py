@@ -207,7 +207,7 @@ def main():
         ranking_weights[rank_type] = st.slider(f"How important is {rank_type}?", 1, 10, 5)
 
     # Apply ranking boost
-    max_ranking_boost = 0.05
+    max_ranking_boost = 0.1
     for index, row in df.iterrows():
         df.loc[index, 'score'] = apply_ranking_boost(row, ranking_weights, max_ranking_boost)
 
@@ -217,23 +217,17 @@ def main():
     find_universities(df)
 
     st.title("University Information Chat")
-    api_key = st.secrets["API_KEY"]
-    user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
-    submit_button = st.button("Submit")
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
 
-    if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
-        response = ask_chatgpt(user_input, api_key)
-        st.write("ChatBot says:", response)
-        # Store user response
-        user_responses[user_input] = response
-    elif user_input.lower() in ['quit', 'exit', 'stop']:
+    if user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
+        st.session_state.df = None  # Optionally clear session state
         st.stop()
-    else:
-        # Display previous answers
-        if user_input in user_responses:
-            st.write("Previous response:")
-            st.write(user_responses[user_input])
+
+    if user_input:
+        response = ask_chatgpt(user_input, st.secrets["API_KEY"])
+        st.write("ChatBot says:", response)
+
 
 if __name__ == "__main__":
     main()
