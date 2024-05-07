@@ -113,28 +113,8 @@ def find_universities(df):
             st.write(top_universities[['University', 'Max Score', 'Min Score']])
     except ValueError:
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
-def ask_chatgpt(question, api_key):
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    # Instruction for GPT to be concise
-    prompt = f"You are a university advisor, at the end of every response ask whether the user as any other question or wants to end typing 'exit', answer coincisely to: {question}"
-    data = {
-        "model": "gpt-3.5-turbo",  # Ensure you are using the appropriate model
-        "messages": [{"role": "user", "content": prompt}]
-    }
-    print("API Request URL:", url)
-    print("API Request Headers:", headers)
-    print("API Request Data:", data)
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 200:
-        return response.json()['choices'][0]['message']['content']
-    else:
-        print("Status Code:", response.status_code)
-        print("Response Body:", response.text)
-        return "Error fetching response from OpenAI."
+
+
 def main():
     st.title("University Recommendation Chatbot")
     # Load data
@@ -213,7 +193,7 @@ def main():
                 ],
                 stream=True,
             )
-        response = st.write_stream(stream)
+            response = st.write_stream(stream)
         st.session_state.messages.append({"role": "Exchange assistant", "content": response})
 
 
