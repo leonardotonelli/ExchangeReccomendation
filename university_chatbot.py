@@ -13,7 +13,12 @@ def load_data(file_path):
 
 # Function to normalize columns
 def normalize_column(column):
-    return (column - column.min()) / (column.max() - column.min())
+    # Ensuring zero division handling
+    range = column.max() - column.min()
+    if range == 0:
+        return column
+    else:
+        return (column - column.min()) / range
 
 # Function to calculate score (changed by andrea)
 def apply_preferences1(df, weights):
