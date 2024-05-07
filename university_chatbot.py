@@ -183,7 +183,8 @@ def main():
     # Find universities based on user's Exchange score
     st.subheader("Find Universities")
     df = sort_by_courses(df)
-    client = st.secrets["API_KEY"]
+    client = OpenAI(api_key=st.secrets["API_KEY"])
+
     find_universities(df)
 
     if "openai_model" not in st.session_state:
