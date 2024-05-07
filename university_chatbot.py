@@ -134,6 +134,10 @@ def ask_chatgpt(question, api_key):
         print("Status Code:", response.status_code)
         print("Response Body:", response.text)
         return "Error fetching response from OpenAI."
+
+def clear_input():
+        # Clear the text input after the message is sent
+        st.session_state.user_input = ""
 def main():
     st.title("University Recommendation Chatbot")
     # Load data
