@@ -217,16 +217,25 @@ def main():
     find_universities(df)
 
     st.title("University Information Chat")
-    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key="chat_query")
 
+# Ensure the chat history is initialized
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
+    
+    user_input = st.text_input("Ask a question about universities (type 'exit' to quit):", key=f"chat_input_{len(st.session_state.chat_history)}")
+    
     if user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
-        st.session_state.df = None  # Optionally clear session state
+        st.session_state.chat_history = []  # Clear chat history
         st.stop()
-
+    
     if user_input:
         response = ask_chatgpt(user_input, st.secrets["API_KEY"])
+        st.session_state.chat_history.append((user_input, response))
         st.write("ChatBot says:", response)
+    
+        # Create a new input box for the next question automatically
+        st.text_input("Ask another question:", key=f"followup_input_{len(st.session_state.chat_history)}")
 
 
 if __name__ == "__main__":
