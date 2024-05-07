@@ -204,14 +204,14 @@ def main():
     find_universities(df)
 
     st.title("University Information Chat")
-    # api_key = 'insert_api_here'
+    api_key = 'sk-proj-CCFwsPVYBqx8kCHbKpkrT3BlbkFJEXcuyP8MWtBz503bWwcy'
 
     user_input = st.text_input("Ask a question about universities (type 'quit' to exit):")
     submit_button = st.button("Submit")
 
     if submit_button and user_input.lower() not in ['quit', 'exit', 'stop']:
         response = ask_chatgpt(user_input, api_key)
-        st.write("ChatGPT says:", response)
+        st.write("ChatBot says:", response)
     elif user_input.lower() in ['quit', 'exit', 'stop']:
         st.write("Exiting... Thank you for using the University Info Chat!")
         st.stop()
