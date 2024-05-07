@@ -186,7 +186,7 @@ def main():
     client = st.secrets["API_KEY"]
     
     if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-3.5-turbo"
+        st.session_state["openai_model"] = "gpt-3.5-turbo"
 
     # Chat session
     with st.chat_message("user"):
