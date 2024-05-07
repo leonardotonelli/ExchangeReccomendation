@@ -12,9 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Debug API Key
-        run: echo "API Key: ${{ secrets.API_KEY }}"
       
       - name: Set up Python
         uses: actions/setup-python@v2
