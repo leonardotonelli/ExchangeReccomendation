@@ -3,7 +3,7 @@ name: Run Python Script
 on:
   push:
     branches:
-      - main  # Adjust branch name if needed
+      - main  
 
 jobs:
   run_script:
@@ -19,9 +19,9 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt  # Adjust as needed
+        run: pip install -r requirements.txt  
 
       - name: Run Python script with secret
         env:
           API_KEY: ${{ secrets.API_KEY }}  # Access the secret
-        run: python your_script.py  # Replace with your script name
+        run: python university_chatbot.py  # Replace with your script name
