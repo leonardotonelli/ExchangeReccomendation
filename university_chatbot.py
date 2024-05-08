@@ -175,10 +175,7 @@ def main():
             st.markdown(message["content"])
 
     if prompt := st.chat_input("Ask me any question about universities?"):
-        prompt_to_bot = f"Answer to the following question as an expert in Universities and Exchange opportunities, without mentioning that you are an expert and in few lines except if asked otherwise: {prompt}"
-        prompt_parts = prompt_to_bot.split(": ")
-        st.session_state.messages.append({"role": "user", "content": prompt_parts[0]})
-        st.session_state.messages.append({"role": "user", "content": prompt_parts[1]})
+        st.session_state.messages.append({"role": "user", "content": f"Answer to the following question as an expert in Universities and Exchange opportunities, without mentioning that you are an expert and in few lines except if asked otherwise: {prompt}"})
 
         with st.chat_message("user"):
             st.markdown(prompt)
