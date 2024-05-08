@@ -111,8 +111,7 @@ def find_universities(df):
         else:
             st.write("Here are the top 10 universities available to you:")
             st.write(top_universities[['University', 'Max Score', 'Min Score']])
-            st.write(top_universities['University'][0])
-        return top_universities['University'][0]
+            st.write(top_universities['University'])
     except ValueError:
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
 
