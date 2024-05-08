@@ -105,7 +105,7 @@ def find_universities(df):
         
         user_score = float(st.text_input("Please enter your Exchange score: "))
         available_universities = df[df['Min Score'] <= user_score]
-        top_universities = available_universities.sort_values(by='score', ascending=False).head(10)
+        top_universities = available_universities.sort_values(by='score', ascending=False)[:10]
         if top_universities.empty:
             st.write("No universities available based on your Exchange score.")
         else:
