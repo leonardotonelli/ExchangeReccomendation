@@ -111,7 +111,7 @@ def find_universities(df):
         else:
             st.write("Here are the top 10 universities available to you:")
             st.write(top_universities[['University', 'Max Score', 'Min Score']])
-            return top_universities['University'][0]
+            st.write(top_universities['University'][0])
     except ValueError:
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
 
@@ -167,7 +167,7 @@ def main():
     df = sort_by_courses(df)
     client = OpenAI(api_key=st.secrets["API_KEY"])
 
-    top = find_universities(df)
+    find_universities(df)
 
 
     # Chatbot
@@ -184,7 +184,7 @@ def main():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if prompt := st.chat_input(f"How's {top} reputation worldwide?"):
+    if prompt := st.chat_input(f"How's reputation worldwide?"):
         st.session_state.messages.append({"role": "user", "content": f"Answer to the following question as an expert in Universities and Exchange opportunities, without mentioning that you are an expert and in few lines except if asked otherwise: {prompt}"})
         with st.chat_message("user"):
             st.markdown(prompt)
