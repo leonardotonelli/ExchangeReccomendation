@@ -188,7 +188,7 @@ def main():
                 ],
                 stream=True,
             )
-            response = stream.choices[1].message["content"]
+            response = st.write_stream(stream)
         st.session_state.messages.append({"role": "assistant", "content": response})
 def clear_input():
     st.session_state.chat = ""  # Clear the text input after the message is sent
