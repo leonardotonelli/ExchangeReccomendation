@@ -105,17 +105,14 @@ def find_universities(df):
         
         user_score = float(st.text_input("Please enter your Exchange score: "))
         available_universities = df[df['Min Score'] <= user_score]
-        top_universities = available_universities.sort_values(by='score', ascending=False)[:10]
+        top_universities = available_universities.sort_values(by='score', ascending=False).head(10)
         if top_universities.empty:
             st.write("No universities available based on your Exchange score.")
         else:
             st.write("Here are the top 10 universities available to you:")
             st.write(top_universities[['University', 'Max Score', 'Min Score']])
-            return top_universities['University'][0]
     except ValueError:
         st.write("Invalid input. Please enter a valid number for your Exchange score.")
-
-
 def main():
     st.title("University Recommendation Chatbot")
     # Load data
@@ -155,69 +152,46 @@ def main():
     ranking_weights = {}
     for rank_type in ranking_types:
         ranking_weights[rank_type] = st.slider(f"How important is {rank_type}?", 1, 10, 5)
-
     # Apply ranking boost
     max_ranking_boost = 0.05
     max_ranking_boost = 0.1
     for index, row in df.iterrows():
         df.loc[index, 'score'] = apply_ranking_boost(row, ranking_weights, max_ranking_boost)
-
     # Find universities based on user's Exchange score
     st.subheader("Find Universities")
     df = sort_by_courses(df)
     client = OpenAI(api_key=st.secrets["API_KEY"])
-
     find_universities(df)
+    # Chatbot
+    st.subheader("Personal Exchange Assistant")
+    st.write("Ask anything you want except information specific to past Bocconi exchange students")
+    if "openai_model" not in st.session_state:
+        st.session_state["openai_model"] = "gpt-3.5-turbo"
+    # Chat session
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
+    if prompt := st.chat_input("Ask me any question about universities?"):
+        st.session_state.messages.append({"role": "user", "content": f"Answer to the following question as an expert in Universities and Exchange opportunities: {prompt}"})
+        st.session_state.messages.append({"role": "user", "content": f"Answer to the following question as an expert in Universities and Exchange opportunities, without mentioning that you are an expert and in few lines except if asked otherwise: {prompt}"})
+        with st.chat_message("user"):
+            st.markdown(prompt)
 
-    st.subheader("Find Universities")
-    df = sort_by_courses(df)
-    client = OpenAI(api_key=st.secrets["API_KEY"])
-
-    top = find_universities(df)
-
-    # Check if top universities have been found
-    if top:
-        # Save to session state that universities are available
-        st.session_state['universities_available'] = True
-
-    # Chatbot interface
-    if st.session_state.get('universities_available'):
-        st.subheader("Personal Exchange Assistant")
-        st.write("Ask anything you want except information specific to past Bocconi exchange students")
-        
-        if "openai_model" not in st.session_state:
-            st.session_state["openai_model"] = "gpt-3.5-turbo"
-
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-
-        prompt = st.chat_input(f"How's {top} reputation worldwide?")
-        if prompt:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
-
-            with st.chat_message("assistant"):
-                stream = client.chat.completions.create(
-                    model=st.session_state["openai_model"],
-                    messages=[
-                        {"role": m["role"], "content": m["content"]}
-                        for m in st.session_state.messages
-                    ],
-                    stream=True,
-                )
-                response = st.write_stream(stream)
-            st.session_state.messages.append({"role": "assistant", "content": response})
-
+        with st.chat_message("assistant"):
+            stream = client.chat.completions.create(
+                model=st.session_state["openai_model"],
+                messages=[
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages
+                ],
+                stream=True,
+            )
+            response = st.write_stream(stream)
+        st.session_state.messages.append({"role": "assistant", "content": response})
 def clear_input():
     st.session_state.chat = ""  # Clear the text input after the message is sent
-
-
-
 if __name__ == "__main__":
     main()
