@@ -163,33 +163,35 @@ def main():
     client = OpenAI(api_key=st.secrets["API_KEY"])
     find_universities(df)
     # Chatbot
-    st.subheader("Personal Exchange Assistant")
-    st.write("Ask anything you want except information specific to past Bocconi exchange students")
-    if "openai_model" not in st.session_state:
-        st.session_state["openai_model"] = "gpt-3.5-turbo"
-    # Chat session
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    for message in st.session_state.messages:
+# Chat session
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    if message["role"] != "assistant":  # Only display user input and assistant responses
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if prompt := st.chat_input("Ask me any question about universities?"):
-        st.session_state.messages.append({"role": "user", "content": f"Answer to the following question as an expert in Universities and Exchange opportunities, without mentioning that you are an expert and in few lines except if asked otherwise: {prompt}"})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+if prompt := st.chat_input("Ask me any question about universities?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-        with st.chat_message("assistant"):
-            stream = client.chat.completions.create(
-                model=st.session_state["openai_model"],
-                messages=[
-                    {"role": m["role"], "content": m["content"]}
-                    for m in st.session_state.messages
-                ],
-                stream=True,
-            )
-            response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+    with st.spinner("Thinking..."):
+        stream = openai.ChatCompletion.create(
+            model=st.session_state["openai_model"],
+            messages=[
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ]
+        )
+
+    response = stream.choices[0].message["content"]
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+    with st.chat_message("assistant"):
+        st.markdown(response)
+        
 def clear_input():
     st.session_state.chat = ""  # Clear the text input after the message is sent
 if __name__ == "__main__":
